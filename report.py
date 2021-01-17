@@ -49,6 +49,7 @@ for mes_ano in cal_mensal:
             saldo_negativo -= cal_mensal[mes_ano]["lucro"]
         else:
             cal_mensal[mes_ano]["ir"] = saldo_atual * 0.2
+            saldo_negativo = 0
 
     if saldo_negativo != 0:
         cal_mensal[mes_ano]["saldo_negativo"] = saldo_negativo
