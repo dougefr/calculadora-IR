@@ -1,30 +1,10 @@
 import csv
 import datetime
+from carteira import Carteira
 
 operacoes = []
 cal_mensal = {}
-carteira = {}
-
-def comprar(ticket, quantidade, preco_medio):
-    if ticket not in carteira:
-        carteira[ticket] = {"quantidade": 0, "preco_medio": 0}
-
-    estado_antes = carteira[ticket]
-    valor_total_antes = estado_antes["preco_medio"] * estado_antes["quantidade"]
-    quantidade_depois = estado_antes["quantidade"] + quantidade
-    preco_medio_depois = (valor_total_antes + (quantidade * preco_medio)) / quantidade_depois
-    carteira[ticket] = {"quantidade": quantidade_depois, "preco_medio": preco_medio_depois}
-
-    return carteira[ticket]
-
-def vender(ticket, quantidade, preco_medio):
-    carteira[ticket]["quantidade"] -= quantidade
-    lucro = (quantidade * preco_medio) - (quantidade * carteira[ticket]["preco_medio"])
-
-    if carteira[ticket]["quantidade"] == 0:
-        carteira[ticket]["preco_medio"] = 0
-
-    return lucro, carteira[ticket]
+carteira = Carteira()
 
 with open("dataminer.csv", newline="") as csvfile:
     operacoes_reader = csv.reader(csvfile, delimiter=",", quotechar="\"")
@@ -46,10 +26,10 @@ for op in operacoes:
         cal_mensal[mes_ano] = {"lucro": 0}
 
     if op["operacao"] == "COMPRA":
-        posicao_carteira = comprar(op["ticket"], op["quantidade"], op["preco_medio"])
+        posicao_carteira = carteira.comprar(op["ticket"], op["quantidade"], op["preco_medio"])
         print(f'[{mes_ano}] Comprando {op["ticket"]} no dia {op["data"]} com preço médio de R${op["preco_medio"]}.')
     else:
-        lucro, posicao_carteira = vender(op["ticket"], op["quantidade"], op["preco_medio"])
+        lucro, posicao_carteira = carteira.vender(op["ticket"], op["quantidade"], op["preco_medio"])
         cal_mensal[mes_ano]["lucro"] += lucro
         print(f'[{mes_ano}] Vendendo {op["ticket"]} no dia {op["data"]} com preço médio de R${op["preco_medio"]} e lucro de R${lucro}')
 
